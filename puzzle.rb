@@ -51,7 +51,7 @@ get "/" do
        if type == "CAD"
          rate = rates.detect {|rate| rate["from"] == "CAD" and rate["to"] == "USD"}
          #convert CAD to USD
-         value = value * rate["conversion"].to_f
+         value = round(value * rate["conversion"].to_f)
          type = "USD"
          
          total += value
@@ -59,7 +59,23 @@ get "/" do
      end
    end
    
-   @total = sprintf("%.2f", total)
+   @total = total
    
    erb :total
+end
+
+def round(value)
+  value = value*100
+  
+  round = sprintf("%.1f", value)
+  if round[-1, 1] == "5"
+    if (value.to_i + 1).odd?
+      value = (value.to_i).to_f
+    else
+      value = (value.to_i+1).to_f
+    end
+  else
+     value =sprintf("%.0f", value).to_f
+  end
+  value = value/100
 end
