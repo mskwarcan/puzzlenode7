@@ -2,4 +2,5 @@ source "http://rubygems.org"
 
 gem "sinatra"
 gem 'fastercsv'
-gem 'activesupport'
+gem 'i18n'
+gem 'activesupport', '3.0.9'
