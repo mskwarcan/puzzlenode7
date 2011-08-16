@@ -15,9 +15,14 @@ get "/" do
   rates = hash["rates"]["rate"]
   
   # Conversion Rates
-  eur_rate = rates.detect {|rate| rate["from"] == "EUR" and rate["to"] == "AUD"}
-  aud_rate = rates.detect {|rate| rate["from"] == "AUD" and rate["to"] == "CAD"}
-  cad_rate = rates.detect {|rate| rate["from"] == "CAD" and rate["to"] == "USD"}
+  eur_to_aud = rates.detect {|rate| rate["from"] == "EUR" and rate["to"] == "AUD"}
+  aud_to_cad = rates.detect {|rate| rate["from"] == "AUD" and rate["to"] == "CAD"}
+  cad_to_usd = rates.detect {|rate| rate["from"] == "CAD" and rate["to"] == "USD"}
+  
+  eur_rate = BigDecimal.new(eur_to_aud["conversion"])
+  aud_rate = BigDecimal.new(aud_to_cad["conversion"])
+  cad_rate = BigDecimal.new(cad_to_usd["conversion"])
+  
   
   #Default data
   sku = "DM1182"
@@ -29,11 +34,11 @@ get "/" do
      end
    end
    
-   total = 0
+   total = BigDecimal.new('0')
  
    rows.each do |row|
      amount = row[2].split(' ')
-     value = amount[0].to_f
+     value = BigDecimal.new(amount[0])
      type = amount[1]
      
      if type == "USD"
@@ -41,19 +46,19 @@ get "/" do
      else
        if type == "EUR"
          #convert EUR to AUD
-         value = round(value * eur_rate["conversion"].to_f * aud_rate["conversion"].to_f * cad_rate["conversion"].to_f)
+         value = round(value * eur_rate * aud_rate * cad_rate)
          total += value
        end
      
        if type == "AUD"
          #convert AUD to CAD
-         value = round(value * aud_rate["conversion"].to_f * cad_rate["conversion"].to_f)
+         value = round(value * aud_rate * cad_rate)
          total += value
        end
      
        if type == "CAD"
          #convert CAD to USD
-         value = round(value * cad_rate["conversion"].to_f)
+         value = round(value * cad_rate)
          total += value
        end
      end
@@ -65,17 +70,14 @@ get "/" do
 end
 
 def round(value)
-  value = value*100
-  
-  round = sprintf("%.1f", value)
+  round = sprintf("%.3f", value)
   if round[-1, 1] == "5"
     if (value.to_i + 1).odd?
-      value = (value.to_i).to_f
+      value = BigDecimal.new((value.to_i).to_s)
     else
-      value = (value.to_i+1).to_f
+      value = BigDecimal.new((value.to_i+1).to_s)
     end
   else
-     value =sprintf("%.0f", value).to_f
+     value = BigDecimal.new(sprintf("%.0f", value))
   end
-  value = value/100
 end
