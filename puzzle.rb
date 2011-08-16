@@ -14,6 +14,11 @@ get "/" do
   hash = Hash.from_xml(xml)
   rates = hash["rates"]["rate"]
   
+  # Conversion Rates
+  eur_rate = rates.detect {|rate| rate["from"] == "EUR" and rate["to"] == "AUD"}
+  aud_rate = rates.detect {|rate| rate["from"] == "AUD" and rate["to"] == "CAD"}
+  cad_rate = rates.detect {|rate| rate["from"] == "CAD" and rate["to"] == "USD"}
+  
   #Default data
   sku = "DM1182"
   
@@ -30,10 +35,6 @@ get "/" do
      amount = row[2].split(' ')
      value = amount[0].to_f
      type = amount[1]
-     
-     eur_rate = rates.detect {|rate| rate["from"] == "EUR" and rate["to"] == "AUD"}
-     aud_rate = rates.detect {|rate| rate["from"] == "AUD" and rate["to"] == "CAD"}
-     cad_rate = rates.detect {|rate| rate["from"] == "CAD" and rate["to"] == "USD"}
      
      if type == "USD"
        total += value
