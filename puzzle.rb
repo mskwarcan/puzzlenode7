@@ -46,19 +46,19 @@ get "/" do
      else
        if type == "EUR"
          #convert EUR to AUD
-         value = round(value * eur_rate * aud_rate * cad_rate)
+         value = BigDecimal.new(sprintf("%.2f", value * eur_rate * aud_rate * cad_rate))
          total += value
        end
      
        if type == "AUD"
          #convert AUD to CAD
-         value = round(value * aud_rate * cad_rate)
+         value = BigDecimal.new(sprintf("%.2f", value * aud_rate * cad_rate))
          total += value
        end
      
        if type == "CAD"
          #convert CAD to USD
-         value = round(value * cad_rate)
+         value = BigDecimal.new(sprintf("%.2f", value * cad_rate))
          total += value
        end
      end
@@ -67,8 +67,4 @@ get "/" do
    @total = total
    
    erb :total
-end
-
-def round(value)
-     value = BigDecimal.new(sprintf("%.2f", value))
 end
