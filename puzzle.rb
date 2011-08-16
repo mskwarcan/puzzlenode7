@@ -31,29 +31,28 @@ get "/" do
      value = amount[0].to_f
      type = amount[1]
      
+     eur_rate = rates.detect {|rate| rate["from"] == "EUR" and rate["to"] == "AUD"}
+     aud_rate = rates.detect {|rate| rate["from"] == "AUD" and rate["to"] == "CAD"}
+     cad_rate = rates.detect {|rate| rate["from"] == "CAD" and rate["to"] == "USD"}
+     
      if type == "USD"
        total += value
      else
        if type == "EUR"
-         rate = rates.detect {|rate| rate["from"] == "EUR" and rate["to"] == "AUD"}
          #convert EUR to AUD
-         value = value * rate["conversion"].to_f
-         type = "AUD"
+         value = round(value * eur_rate["conversion"].to_f * aud_rate["conversion"].to_f * cad_rate["conversion"].to_f)
+         total += value
        end
      
        if type == "AUD"
-         rate = rates.detect {|rate| rate["from"] == "AUD" and rate["to"] == "CAD"}
          #convert AUD to CAD
-         value = value * rate["conversion"].to_f
-         type = "CAD"
+         value = round(value * aud_rate["conversion"].to_f * cad_rate["conversion"].to_f)
+         total += value
        end
      
        if type == "CAD"
-         rate = rates.detect {|rate| rate["from"] == "CAD" and rate["to"] == "USD"}
          #convert CAD to USD
-         value = round(value * rate["conversion"].to_f)
-         type = "USD"
-         
+         value = round(value * cad_rate["conversion"].to_f)
          total += value
        end
      end
