@@ -70,14 +70,5 @@ get "/" do
 end
 
 def round(value)
-  round = sprintf("%.3f", value)
-  if round[-1, 1] == "5"
-    if (value.to_i + 1).odd?
-      value = BigDecimal.new((value.to_i).to_s)
-    else
-      value = BigDecimal.new((value.to_i+1).to_s)
-    end
-  else
-     value = BigDecimal.new(sprintf("%.0f", value))
-  end
+     value = BigDecimal.new(sprintf("%.2f", value))
 end
