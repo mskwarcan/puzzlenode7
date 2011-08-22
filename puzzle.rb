@@ -11,23 +11,26 @@ get "/" do
   tax_rate = 1.0411416
   
   #convert .json into a hash
-  file = File.open("public/sample_vacation_rentals.json")
+  file = File.open("public/vacation_rentals.json")
   json = file.readlines.to_s
   data = ActiveSupport::JSON.decode(json)
   
   #grab start and end date
-  file = File.open("public/sample_input.txt")
+  file = File.open("public/input.txt")
   text = file.readlines.to_s
   dates = text.partition(/ - /)
   start_date = Time.parse(dates[0]).to_date
   end_date = Time.parse(dates[2]).to_date
-  days = (end_date - start_date).to_i
   
   resorts = []
   
   data.each do |resort|
+    days = (end_date - start_date).to_i
+    rate = 0
+    cleaning_fee = 0
+    
     name = resort["name"]
-    cleaning_fee = resort["cleaning_fee"].nil? ? 0 : resort["cleaning_fee"]
+    cleaning_fee = resort["cleaning fee"].nil? ? 0 : resort["cleaning fee"].delete("$").to_f
     rate = resort["rate"].nil? ? 0 : resort["rate"].delete("$").to_f
     
     if resort["seasons"]
@@ -73,7 +76,7 @@ get "/" do
       
       if season_one_range === start_date
         if season_one_end < end_date
-          season_one_days = (season_one_end - start_date).to_i
+          season_one_days = (season_one_end - start_date).to_i + 1
         else
           season_one_days = days
           season_two_price = 0
